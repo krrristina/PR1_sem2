@@ -1,8 +1,11 @@
 # Практическое занятие №1 — Разделение монолита на 2 микросервиса. Взимодействие через HTTP
 
-**Дисциплина:** Технологии индустриального программирования  
+**Дисциплина:** Технологии индустриального программирования
+
 **Преподаватель:** Адышкин Сергей Сергеевич  
+
 **Семестр:** 2, 2025–2026 уч. год
+
 **Подготовила:** Сорокина К.С., ЭФМО-01-25.
 
 ### Цель:
@@ -10,9 +13,13 @@
 
 ### Получены следующие результаты:
 •	выделены границы сервисов (зона ответственности);
+
 •	реализованы API сервисов и их контракты;
+
 •	выполнен межсервисный HTTP-вызов с таймаутом и обработкой ошибок;
+
 •	прокинут correlation/request-id;
+
 •	документируются эндпоинты и сценарии запуска.
 
 ### Структура проекта:
@@ -61,11 +68,21 @@
 ```
 ### Запуск сервера и установка порта:
 
+
+### Терминал 1 — Auth Service
+```bash
+cd services/auth
+AUTH_PORT=8080 go run ./cmd/auth
+```
 ![](https://github.com/krrristina/PR1_sem2/blob/main/screenshots/запуск%20сервера%201.png)
+
+
+### Терминал 2 — Tasks Service
+```bash
+cd services/tasks
+TASKS_PORT=8081 AUTH_BASE_URL=http://localhost:8080 go run ./cmd/tasks
+```
 ![](https://github.com/krrristina/PR1_sem2/blob/main/screenshots/запуск%20сервера%202.png)
-
-### Проверки через POSTMAN:
-
 
 ---
 
@@ -101,13 +118,14 @@ sequenceDiagram
 
 ---
 
-## 3. Эндпоинты
+## Проверки через POSTMAN:
+
+### Эндпоинты
 
 ### Auth Service — `http://localhost:8080`
 
 #### POST /v1/auth/login
 Получение токена доступа.
-
 **Request:**
 ```json
 {
@@ -115,7 +133,6 @@ sequenceDiagram
   "password": "student"
 }
 ```
-
 **Response 200:**
 ```json
 {
@@ -190,6 +207,8 @@ curl -i -X POST http://localhost:8081/v1/tasks \
 
 Оба лога содержат одинаковый `request_id=req-003` — корреляция работает корректно.
 
+![](https://github.com/krrristina/PR1_sem2/blob/main/screenshots/объект%20задачи%20с%20id.png)
+
 ---
 
 ## 5. Инструкция запуска
@@ -254,16 +273,20 @@ curl -i http://localhost:8081/v1/tasks
 ### POST /v1/auth/login
 Получение токена.
 - **200** — `{"access_token": "demo-token", "token_type": "Bearer"}`
+![](https://github.com/krrristina/PR1_sem2/blob/main/screenshots/токен%208081.png)
 - **401** — неверные учётные данные
 
 ### GET /v1/auth/verify
 Проверка токена. Заголовок: `Authorization: Bearer <token>`
 - **200** — `{"valid": true, "subject": "student"}`
+![](https://github.com/krrristina/PR1_sem2/blob/main/screenshots/проверка%20токена.png)
 - **401** — токен невалиден
+![](https://github.com/krrristina/PR1_sem2/blob/main/screenshots/401%20запрос%20без%20токена.png)
 
 ## Tasks Service (порт 8082)
 
 Все запросы требуют заголовка `Authorization: Bearer <token>`.
+![](https://github.com/krrristina/PR1_sem2/blob/main/screenshots/объект%20задачи%20с%20id.png)
 
 ### POST /v1/tasks — создать задачу (201)
 ### GET /v1/tasks — список задач (200)
