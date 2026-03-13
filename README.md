@@ -213,18 +213,6 @@ curl -i -X POST http://localhost:8081/v1/tasks \
 
 ## 5. Инструкция запуска
 
-### Терминал 1 — Auth Service
-```bash
-cd services/auth
-AUTH_PORT=8080 go run ./cmd/auth
-```
-
-### Терминал 2 — Tasks Service
-```bash
-cd services/tasks
-TASKS_PORT=8081 AUTH_BASE_URL=http://localhost:8080 go run ./cmd/tasks
-```
-
 ### Терминал 3 — Проверка
 ```bash
 # Получить токен
